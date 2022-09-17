@@ -36,6 +36,4 @@ public class Country implements Serializable {
 
 	private String labelFr;
 
-	private String labelEn;
-
 }

@@ -63,7 +63,7 @@ public class Employee implements Serializable {
 	@JoinColumn(name = "manager_id")
 	private Employee manager;
 
-	@OneToMany(mappedBy = "manager")
+	@OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
 	private List<Employee> employees;
 
 	@Override

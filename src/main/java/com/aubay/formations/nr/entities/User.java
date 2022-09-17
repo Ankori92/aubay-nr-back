@@ -7,8 +7,6 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -18,7 +16,6 @@ import javax.persistence.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.aubay.formations.nr.enums.LangEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -49,11 +46,6 @@ public class User implements UserDetails {
 
 	private String password;
 
-	@Enumerated(EnumType.STRING)
-	private LangEnum preferredLang;
-
-	private boolean enabled;
-
 	@ManyToOne
 	@JoinColumn(name = "employee_id")
 	private Employee employee;
@@ -77,13 +69,9 @@ public class User implements UserDetails {
 		return authorities;
 	}
 
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
-
 	// @formatter:off
 	// Not used
+	@Override public boolean isEnabled() {return true;}
 	@Override public boolean isAccountNonExpired() {return true;}
 	@Override public boolean isAccountNonLocked() {return true;}
 	@Override public boolean isCredentialsNonExpired() {return true;}

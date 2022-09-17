@@ -22,8 +22,6 @@ public class CountryDTO {
 
 	private String labelFr;
 
-	private String labelEn;
-
 	/**
 	 * Mapper to Entity
 	 * @formatter:off
@@ -33,7 +31,6 @@ public class CountryDTO {
 		return Country.builder()
 				.code(code)
 				.labelFr(labelFr)
-				.labelEn(labelEn)
 				.build();
 	}
 

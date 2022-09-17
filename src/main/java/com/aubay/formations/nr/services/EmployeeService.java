@@ -13,7 +13,6 @@ import com.aubay.formations.nr.entities.Country;
 import com.aubay.formations.nr.entities.Employee;
 import com.aubay.formations.nr.repositories.CountryRepository;
 import com.aubay.formations.nr.repositories.EmployeeRepository;
-import com.aubay.formations.nr.utils.AuthentHelper;
 
 /**
  * Employees and Teams services
@@ -23,9 +22,6 @@ import com.aubay.formations.nr.utils.AuthentHelper;
 @Service
 @Transactional
 public class EmployeeService {
-
-	@Autowired
-	private AuthentHelper authentHelper;
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
@@ -48,20 +44,6 @@ public class EmployeeService {
 		}
 		hibernateRecursiveInitialization(employee);
 		return employee;
-	}
-
-	/**
-	 * Create or update employee collection
-	 *
-	 * @param employees collection
-	 * @return saved employees
-	 */
-	public List<Employee> saveEmployees(final List<Employee> employees) {
-		final List<Employee> savedEmployees = employeeRepository.saveAll(employees);
-		for (final Employee e : savedEmployees) {
-			hibernateRecursiveInitialization(e);
-		}
-		return savedEmployees;
 	}
 
 	/**
@@ -94,50 +76,6 @@ public class EmployeeService {
 			}
 		}
 		return employees;
-	}
-
-	/**
-	 * Get ALL employees stored in database
-	 *
-	 * @param filterResigned true if resigned employees must be removed from result,
-	 *                       false else
-	 * @return all Employee objects
-	 */
-	public List<Employee> getAllEmployees(final boolean filterResigned) {
-		final var employees = employeeRepository.findAll();
-		for (final Employee e : employees) {
-			hibernateRecursiveInitialization(e);
-			if (filterResigned) {
-				filterResignedEmployees(e);
-			}
-		}
-		return employees;
-	}
-
-	/**
-	 * Delete all employees from database, except current user
-	 */
-	public void removeAllEmployeesExceptMe() {
-		employeeRepository.deleteAllExcept(authentHelper.getUser().getEmployee());
-	}
-
-	/**
-	 * Save countries list in database
-	 *
-	 * @param countries
-	 */
-	public void saveCountries(final List<Country> countries) {
-		countryRepository.saveAll(countries);
-	}
-
-	/**
-	 * Get country entity by countryCode
-	 *
-	 * @param countryCode
-	 * @return Country
-	 */
-	public Country getCountry(final String countryCode) {
-		return countryRepository.getReferenceById(countryCode);
 	}
 
 	/**

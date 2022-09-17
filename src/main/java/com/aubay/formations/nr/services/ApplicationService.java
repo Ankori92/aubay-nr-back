@@ -1,5 +1,6 @@
 package com.aubay.formations.nr.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.transaction.Transactional;
@@ -12,12 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.aubay.formations.nr.entities.Employee;
 import com.aubay.formations.nr.entities.User;
-import com.aubay.formations.nr.enums.LangEnum;
 import com.aubay.formations.nr.repositories.UserRepository;
 import com.aubay.formations.nr.utils.AuthentHelper;
 
 /**
- * Application services (User, lang, etc)
+ * Application services (User, etc)
  *
  * @author jbureau@aubay.com
  */
@@ -27,9 +27,6 @@ public class ApplicationService {
 
 	@Autowired
 	private AuthentHelper authentHelper;
-
-	@Autowired
-	private EmployeeService employeeService;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -42,7 +39,9 @@ public class ApplicationService {
 	public User whoami() {
 		final var authenticatedUserId = authentHelper.getUsername();
 		final var authenticatedUser = userRepository.getReferenceById(authenticatedUserId);
-		employeeService.hibernateRecursiveInitialization(authenticatedUser.getEmployee());
+		final var employee = authenticatedUser.getEmployee();
+		Hibernate.initialize(employee.getCountry());
+		employee.setEmployees(new ArrayList<>());
 		return authenticatedUser;
 	}
 
@@ -59,26 +58,7 @@ public class ApplicationService {
 			.username(username)
 			.password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
 			.authorities(Arrays.asList(authorities))
-			.enabled(true)
-			.preferredLang(LangEnum.FR)
 			.employee(employee)
 			.build());
-	}
-
-	/**
-	 * Change the user's preferred language
-	 *
-	 * @param lang
-	 * @return
-	 */
-	public User setPreferredLanguage(final LangEnum lang) {
-		if (lang == null) {
-			throw new IllegalArgumentException("LangEnum can't be null");
-		}
-		final var authenticatedUserId = authentHelper.getUsername();
-		final var user = userRepository.getReferenceById(authenticatedUserId);
-		user.setPreferredLang(lang);
-		Hibernate.initialize(user);
-		return user;
 	}
 }

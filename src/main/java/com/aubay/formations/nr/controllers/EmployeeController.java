@@ -31,8 +31,8 @@ public class EmployeeController {
 	 * @return Updated employee
 	 */
 	@PostMapping("/employees")
-	public EmployeeDTO updateEmployee(@RequestBody final EmployeeDTO employeeDto) {
-		return EmployeeDTO.fromEntity(employeeService.saveEmployee(employeeDto.toEntity()));
+	public void updateEmployee(@RequestBody final EmployeeDTO employeeDto) {
+		employeeService.saveEmployee(employeeDto.toEntity());
 	}
 
 	/**

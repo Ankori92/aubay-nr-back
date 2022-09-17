@@ -52,12 +52,10 @@ public class EmployeeService {
 	 * @param employee
 	 * @return saved employee
 	 */
-	public Employee saveEmployee(final Employee employee) {
-		final var original = findEmployee(employee.getId(), false);
+	public void saveEmployee(final Employee employee) {
+		final var original = employeeRepository.getReferenceById(employee.getId());
 		employee.setManager(original.getManager());
-		final var e = employeeRepository.save(employee);
-		hibernateRecursiveInitialization(e);
-		return e;
+		employeeRepository.save(employee);
 	}
 
 	/**

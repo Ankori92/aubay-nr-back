@@ -39,11 +39,8 @@ public class StatisticsController {
 	 *
 	 * @return
 	 */
-	@Transactional
 	@DeleteMapping("/stats")
-	public void clearUsageStatistics(@RequestBody final List<String> uris) {
-		for (final String uri : uris) {
-			usageRepository.deleteByUri(uri);
-		}
+	public void clearUsageStatistics() {
+		usageRepository.deleteAllInBatch();
 	}
 }

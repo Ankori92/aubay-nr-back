@@ -55,7 +55,7 @@ public class Employee implements Serializable {
 
 	private boolean resigned;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "country_id")
 	private Country country;
 

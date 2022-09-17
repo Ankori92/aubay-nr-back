@@ -55,8 +55,7 @@ public class WebSecurityConfig {
 				if(!user.isPresent()) {
 					throw new UsernameNotFoundException("L'utilisateur " + username + " n'a pas été trouvé");
 				}
-				employeeService.filterResignedEmployees(user.get().getEmployee());
-				employeeService.hibernateRecursiveInitialization(user.get().getEmployee());
+				employeeService.initializeEmployee(user.get().getEmployee());
 				return user.get();
 			}
 		};

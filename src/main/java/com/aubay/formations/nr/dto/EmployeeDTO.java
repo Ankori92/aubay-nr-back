@@ -36,8 +36,6 @@ public class EmployeeDTO {
 
 	private CountryDTO country;
 
-	private EmployeeDTO manager;
-
 	private List<EmployeeDTO> employees;
 
 	/**
@@ -54,8 +52,33 @@ public class EmployeeDTO {
 				.salary(salary)
 				.resigned(resigned)
 				.country(country.toEntity())
-				.manager(manager == null ? null : manager.toEntity())
 				.employees(employees == null ? new ArrayList<>() : employees.stream().map(EmployeeDTO::toEntity).toList())
 				.build();
+	}
+
+	/**
+	 * Mapper from Entity
+	 * @return
+	 */
+	public static EmployeeDTO fromEntity(final Employee e){
+		return EmployeeDTO.builder()
+				.id(e.getId())
+				.firstname(e.getFirstname())
+				.lastname(e.getLastname())
+				.entryDate(e.getEntryDate())
+				.salary(e.getSalary())
+				.resigned(e.isResigned())
+				.country(CountryDTO.fromEntity(e.getCountry()))
+				.employees(e.getEmployees() == null ? new ArrayList<>() : e.getEmployees().stream().map(EmployeeDTO::fromEntity).toList())
+				.build();
+	}
+
+	/**
+	 * Mapper from entities
+	 * @param topManagers
+	 * @return
+	 */
+	public static List<EmployeeDTO> fromEntities(final List<Employee> topManagers) {
+		return topManagers.stream().map(EmployeeDTO::fromEntity).toList();
 	}
 }

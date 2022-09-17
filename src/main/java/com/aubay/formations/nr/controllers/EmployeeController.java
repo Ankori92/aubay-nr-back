@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aubay.formations.nr.dto.EmployeeDTO;
 import com.aubay.formations.nr.entities.Country;
-import com.aubay.formations.nr.entities.Employee;
 import com.aubay.formations.nr.services.EmployeeService;
 
 /**
@@ -32,8 +31,8 @@ public class EmployeeController {
 	 * @return Updated employee
 	 */
 	@PostMapping("/employees")
-	public Employee updateEmployee(@RequestBody final EmployeeDTO employeeDto) {
-		return employeeService.saveEmployee(employeeDto.toEntity());
+	public EmployeeDTO updateEmployee(@RequestBody final EmployeeDTO employeeDto) {
+		return EmployeeDTO.fromEntity(employeeService.saveEmployee(employeeDto.toEntity()));
 	}
 
 	/**
@@ -42,9 +41,9 @@ public class EmployeeController {
 	 * @return
 	 */
 	@GetMapping("/employees/top")
-	public List<Employee> getTopManagers(
+	public List<EmployeeDTO> getTopManagers(
 			@RequestParam(value = "filterResigned", defaultValue = "false") final boolean filterResigned) {
-		return employeeService.getTopManagers(filterResigned);
+		return EmployeeDTO.fromEntities(employeeService.getTopManagers(filterResigned));
 	}
 
 	/**

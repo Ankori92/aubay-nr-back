@@ -34,4 +34,11 @@ public class CountryDTO {
 				.build();
 	}
 
+	public static CountryDTO fromEntity(final Country c) {
+		return CountryDTO.builder()
+				.code(c.getCode())
+				.labelFr(c.getLabelFr())
+				.build();
+	}
+
 }

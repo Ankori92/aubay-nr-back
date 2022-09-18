@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,10 +41,22 @@ public class EmployeeController {
 	 *
 	 * @return
 	 */
+	@GetMapping("/employees/{id}")
+	public EmployeeDTO getManager(
+			@RequestParam(value = "filterResigned", defaultValue = "false") final boolean filterResigned,
+			@RequestParam(value = "onlyDirectTeam", defaultValue = "true") final boolean onlyDirectTeam,
+			@PathVariable("id") final long id) {
+		return EmployeeDTO.fromEntity(employeeService.getEmployee(id, filterResigned, onlyDirectTeam));
+	}
+
+	/**
+	 * Get TOP employees
+	 *
+	 * @return
+	 */
 	@GetMapping("/employees/top")
-	public List<EmployeeDTO> getTopManagers(
-			@RequestParam(value = "filterResigned", defaultValue = "false") final boolean filterResigned) {
-		return EmployeeDTO.fromEntities(employeeService.getTopManagers(filterResigned));
+	public List<EmployeeDTO> getTopManagers() {
+		return EmployeeDTO.fromEntities(employeeService.getTopManagers());
 	}
 
 	/**

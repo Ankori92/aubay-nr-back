@@ -66,6 +66,8 @@ public class Employee implements Serializable {
 	@OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
 	private List<Employee> employees;
 
+	private transient int teamSize;
+
 	@Override
 	public final String toString() {
 		return firstname + " " + lastname;

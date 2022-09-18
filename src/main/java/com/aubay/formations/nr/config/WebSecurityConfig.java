@@ -55,7 +55,7 @@ public class WebSecurityConfig {
 				if(!user.isPresent()) {
 					throw new UsernameNotFoundException("L'utilisateur " + username + " n'a pas été trouvé");
 				}
-				employeeService.initializeEmployee(user.get().getEmployee());
+				employeeService.initializeEmployee(user.get().getEmployee(), true /* Load only direct team for authenticated user */);
 				return user.get();
 			}
 		};

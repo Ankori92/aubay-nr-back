@@ -19,6 +19,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 	List<Employee> findByManagerNullAndResignedFalse();
 
-	@Query(value = "WITH emp(id, firstname, lastname, salary, entry_date, resigned, country_id, manager_id) AS (SELECT id, firstname, lastname, salary, entry_date, resigned, country_id, manager_id FROM employees WHERE id = :managerId UNION ALL SELECT child.id, child.firstname, child.lastname, child.salary, child.entry_date, child.resigned, child.country_id, child.manager_id FROM employees child JOIN emp parent ON child.manager_id = parent.id) SELECT id, firstname, lastname, salary, entry_date, resigned, country_id, manager_id FROM emp", nativeQuery = true)
-	List<Map<String, Object>> findEmployeesInTree(long managerId);
+	@Query(value = "SELECT m.id, m.firstname, m.lastname, m.salary, m.entry_date, m.resigned, m.country_id, m.manager_id, count(e.*) AS team_size FROM  employees m RIGHT JOIN employees e ON e.manager_id = m.id WHERE e.manager_id IN (:managersId) AND e.resigned = false GROUP BY m.id UNION ALL SELECT e.id, e.firstname, e.lastname, e.salary, e.entry_date, e.resigned, e.country_id, e.manager_id, 0 AS team_size FROM  employees e WHERE e.manager_id IN (:managersId) AND e.resigned = false", nativeQuery = true)
+	List<Map<String, Object>> findDirectTeamOf(List<Long> managersId);
+
+	@Query(value = "WITH emp(id, firstname, lastname, salary, entry_date, resigned, country_id, manager_id) AS (SELECT id, firstname, lastname, salary, entry_date, resigned, country_id, manager_id FROM employees WHERE id IN (:managersId) UNION ALL SELECT child.id, child.firstname, child.lastname, child.salary, child.entry_date, child.resigned, child.country_id, child.manager_id FROM employees child JOIN emp parent ON child.manager_id = parent.id WHERE child.resigned = false) SELECT id, firstname, lastname, salary, entry_date, resigned, country_id, manager_id FROM emp", nativeQuery = true)
+	List<Map<String, Object>> findEmployeesInTree(List<Long> managersId);
+
+	@Query(value = "WITH emp(id, manager_id) AS (SELECT id, manager_id FROM employees WHERE id IN (:managersId)	UNION ALL SELECT child.id, child.manager_id FROM employees child JOIN emp parent ON child.manager_id = parent.id WHERE child.resigned = false) SELECT id, manager_id FROM emp", nativeQuery = true)
+	List<Map<String, Object>> findEmployeesIdBelow(List<Long> managersId);
+
 }

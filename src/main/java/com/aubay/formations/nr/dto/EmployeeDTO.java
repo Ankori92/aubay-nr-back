@@ -38,6 +38,8 @@ public class EmployeeDTO {
 
 	private List<EmployeeDTO> employees;
 
+	private Integer teamSize;
+
 	/**
 	 * Mapper to Entity
 	 * @formatter:off
@@ -70,6 +72,7 @@ public class EmployeeDTO {
 				.resigned(e.isResigned())
 				.country(CountryDTO.fromEntity(e.getCountry()))
 				.employees(e.getEmployees() == null ? new ArrayList<>() : e.getEmployees().stream().map(EmployeeDTO::fromEntity).toList())
+				.teamSize(e.getTeamSize())
 				.build();
 	}
 

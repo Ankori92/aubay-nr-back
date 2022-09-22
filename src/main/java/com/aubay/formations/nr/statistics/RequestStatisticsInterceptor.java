@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
@@ -63,8 +65,12 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 		if (response instanceof final ContentCachingResponseWrapper cachedResponse) {
 			length = cachedResponse.getContentSize();
 		}
+		var path = "";
+		if(handler instanceof final HandlerMethod handlerMethod) {
+			path = handlerMethod.getMethodAnnotation(RequestMapping.class).path()[0];
+		}
 		usageRepository.save(Usage.builder()
-				.uri(request.getMethod() + " " + request.getRequestURI())
+				.uri(request.getMethod() + " " +  path)
 				.date(new Date())
 				.duration(duration)
 				.queries(queries)

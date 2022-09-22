@@ -25,7 +25,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @Entity
 @Table(name = "users")
-@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "password" /* security */, "authorities" /* roles */ })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "password" /* security */, "authorities" /* roles */,
+		"accountNonExpired" /* Not used */, "accountNonLocked" /* Not used */, "credentialsNonExpired" /* Not used */,
+		"enabled" /* Not used */ })
 public class User implements UserDetails {
 
 	private static final long serialVersionUID = -3268646257064545505L;

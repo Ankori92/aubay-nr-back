@@ -96,7 +96,7 @@ public class ExercicesController {
 		for(final Usage usage : usages) {
 			var stat = stats.get(usage.getUri());
 			if(stat == null) {
-				stat = new StatisticsDTO(usage.getUri(), usage.getDuration(), usage.getQueries(), usage.getWeight(), 0);
+				stat = new StatisticsDTO(usage.getUri(), null, usage.getDuration(), usage.getQueries(), usage.getWeight(), 0);
 				stats.put(usage.getUri(), stat);
 			}
 			stat.incrementValues(usage); // Ajoute les valeurs de l'usage en cours aux statistiques de l'URI

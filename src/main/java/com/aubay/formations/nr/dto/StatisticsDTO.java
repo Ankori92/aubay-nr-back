@@ -1,9 +1,16 @@
 package com.aubay.formations.nr.dto;
 
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import com.aubay.formations.nr.entities.Usage;
 
 public class StatisticsDTO {
 	private final String uri;
+
+	private final Date date;
 
 	private int duration;
 
@@ -13,8 +20,10 @@ public class StatisticsDTO {
 
 	private int calls;
 
-	public StatisticsDTO(final String uri, final int duration, final int queries, final int weight, final int calls) {
+	public StatisticsDTO(final String uri, final Date date, final int duration, final int queries, final int weight,
+			final int calls) {
 		this.uri = uri;
+		this.date = date;
 		this.duration = duration;
 		this.queries = queries;
 		this.weight = weight;
@@ -23,6 +32,10 @@ public class StatisticsDTO {
 
 	public String getUri() {
 		return uri;
+	}
+
+	public Date getDate() {
+		return date;
 	}
 
 	public int getDuration() {
@@ -41,6 +54,36 @@ public class StatisticsDTO {
 		return calls;
 	}
 
+	/**
+	 * Build DTO from raw data
+	 * @formatter:off
+	 * @param data
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	public static List<StatisticsDTO> fromMultipleRawData(final List<Map<String, Object>> data) {
+		return data.stream().map(StatisticsDTO::fromRawData).toList();
+	}
+
+	/**
+	 * Build DTO from raw data
+	 * @formatter:off
+	 * @param data
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	public static StatisticsDTO fromRawData(final Map<String, Object> data) {
+		return new StatisticsDTO(
+				(String) data.get("uri"),
+				(Date) data.get("date"),
+				((Double) data.get("duration")).intValue(),
+				((Double) data.get("queries")).intValue(),
+				((Double) data.get("weight")).intValue(),
+				((BigInteger) data.get("calls")).intValue());
+	}
+
 	public void incrementCalls() {
 		calls++;
 	}
@@ -56,5 +99,4 @@ public class StatisticsDTO {
 		duration /= calls;
 		queries /= calls;
 		weight /= calls;
-	}
-}
+	}}

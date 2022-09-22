@@ -2,6 +2,7 @@ package com.aubay.formations.nr.entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,12 +14,6 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 /**
  * Usage entity<br />
  * Represent usage of one application functionality<br />
@@ -28,11 +23,7 @@ import lombok.NoArgsConstructor;
  *
  * @author jbureau@aubay.com
  */
-@Data
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "usages")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Usage implements Serializable {
@@ -42,7 +33,6 @@ public class Usage implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usage_generator")
 	@SequenceGenerator(name = "usage_generator", sequenceName = "usage_seq")
-	@EqualsAndHashCode.Include
 	private long id;
 
 	private String uri;
@@ -56,4 +46,55 @@ public class Usage implements Serializable {
 
 	private int weight;
 
+	public Usage() {
+	}
+
+	public Usage(final String uri, final int duration, final int queries, final int weight) {
+		this.uri = uri;
+		this.duration = duration;
+		this.queries = queries;
+		this.weight = weight;
+		date = new Date();
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public int getQueries() {
+		return queries;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final var other = (Usage) obj;
+		return id == other.id;
+	}
 }

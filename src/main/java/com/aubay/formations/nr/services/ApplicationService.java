@@ -54,11 +54,6 @@ public class ApplicationService {
 	 * @formatter:off
 	 */
 	public void createAccount(final String username, final String password, final Employee employee, final GrantedAuthority... authorities) {
-		userRepository.save(User.builder()
-			.username(username)
-			.password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
-			.authorities(Arrays.asList(authorities))
-			.employee(employee)
-			.build());
+		userRepository.save(new User(username, PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password), employee, Arrays.asList(authorities)));
 	}
 }

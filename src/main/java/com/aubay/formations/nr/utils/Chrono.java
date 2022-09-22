@@ -2,7 +2,8 @@ package com.aubay.formations.nr.utils;
 
 import java.util.Date;
 
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Chronometer<br />
@@ -25,8 +26,9 @@ import lombok.extern.log4j.Log4j2;
  *
  * @author jbureau@aubay.com
  */
-@Log4j2
 public class Chrono {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Chrono.class);
 
 	private static ThreadLocal<Date> threadChronoTime = new ThreadLocal<>();
 
@@ -68,7 +70,7 @@ public class Chrono {
 		final var lastStep = threadChronoTime.get();
 		final var trace = "[CHRONO] " + stepLabel + (nbRows != null ? " (" + nbRows + " lignes traitées)" : "")
 				+ (lastStep != null ? " : " + (stepTime.getTime() - lastStep.getTime()) + "ms" : "");
-		log.info(trace);
+		LOG.info(trace);
 		threadChronoTime.set(stepTime);
 	}
 }

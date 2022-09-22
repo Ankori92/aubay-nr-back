@@ -1,10 +1,10 @@
 package com.aubay.formations.nr.statistics;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +16,6 @@ import com.aubay.formations.nr.entities.Usage;
 import com.aubay.formations.nr.repositories.UsageRepository;
 import com.aubay.formations.nr.utils.Chrono;
 
-import lombok.extern.log4j.Log4j2;
-
 /**
  * Interceptor for all web API calls<br />
  * This interceptor show how many SQL statements was executed and the execution
@@ -26,9 +24,10 @@ import lombok.extern.log4j.Log4j2;
  *
  * @author jbureau@aubay.com
  */
-@Log4j2
 @Component
 public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
+
+	private static final Logger LOG = LoggerFactory.getLogger(RequestStatisticsInterceptor.class);
 
 	private final ThreadLocal<Long> executionTime = new ThreadLocal<>();
 
@@ -70,16 +69,10 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 			final var requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
 			path = requestMapping != null && requestMapping.path().length > 0 ? requestMapping.path()[0] : "";
 		}
-		usageRepository.save(Usage.builder()
-				.uri(request.getMethod() + " " +  path)
-				.date(new Date())
-				.duration(duration)
-				.queries(queries)
-				.weight(length)
-				.build());
+		usageRepository.save(new Usage(request.getMethod() + " " +  path, duration, queries, length));
 		Chrono.trace("Statistics");
 		Chrono.stop();
-		log.info("[Time: {} ms] [Queries: {}] {} {}", duration, queries, request.getMethod(), request.getRequestURI());
+		LOG.info("[Time: {} ms] [Queries: {}] {} {}", duration, queries, request.getMethod(), request.getRequestURI());
 	}
 
 	@Override

@@ -205,8 +205,7 @@ public class EmployeeService {
 	private Employee buildEmployee(final Map<String, Object> empData, final List<Map<String, Object>> allEmpData,
 			final Map<Long, Set<Long>> relations, final Map<String, Country> allCountries, final boolean onlyDirectTeam) {
 		final var employeeId = getId(empData);
-		return Employee.builder()
-				.id(employeeId)
+		return Employee.builder(employeeId)
 				.firstname(getFirstname(empData))
 				.lastname(getLastname(empData))
 				.entryDate(getEntryDate(empData))

@@ -18,22 +18,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 /**
  * User entity
  *
  * @author jbureau@aubay.com
  */
-@Data
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "password" /* security */, "authorities" /* roles */ })
 public class User implements UserDetails {
@@ -41,7 +31,6 @@ public class User implements UserDetails {
 	private static final long serialVersionUID = -3268646257064545505L;
 
 	@Id
-	@EqualsAndHashCode.Include
 	private String username;
 
 	private String password;
@@ -55,9 +44,29 @@ public class User implements UserDetails {
 	@Column(name = "authority")
 	private List<GrantedAuthority> authorities;
 
+	public User() {
+	}
+
+	public User(final String username, final String password, final Employee employee,
+			final List<GrantedAuthority> authorities) {
+		this.username = username;
+		this.password = password;
+		this.employee = employee;
+		this.authorities = authorities;
+	}
+
 	@Override
 	public String getUsername() {
 		return username;
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	public Employee getEmployee() {
+		return employee;
 	}
 
 	public List<String> getRoles() {

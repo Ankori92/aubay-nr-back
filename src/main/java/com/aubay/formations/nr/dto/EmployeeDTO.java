@@ -1,26 +1,20 @@
 package com.aubay.formations.nr.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.aubay.formations.nr.entities.Employee;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * Employee entity
  *
  * @author jbureau@aubay.com
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class EmployeeDTO {
+public class EmployeeDTO implements Serializable {
+
+	private static final long serialVersionUID = 723051368789385748L;
 
 	private long id;
 
@@ -40,14 +34,16 @@ public class EmployeeDTO {
 
 	private Integer teamSize;
 
+	public EmployeeDTO() {
+	}
+
 	/**
 	 * Mapper to Entity
 	 * @formatter:off
 	 * @return
 	 */
 	public Employee toEntity() {
-		return Employee.builder()
-				.id(id)
+		return Employee.builder(id)
 				.firstname(firstname)
 				.lastname(lastname)
 				.entryDate(entryDate)
@@ -63,8 +59,7 @@ public class EmployeeDTO {
 	 * @return
 	 */
 	public static EmployeeDTO fromEntity(final Employee e){
-		return EmployeeDTO.builder()
-				.id(e.getId())
+		return EmployeeDTO.builder(e.getId())
 				.firstname(e.getFirstname())
 				.lastname(e.getLastname())
 				.entryDate(e.getEntryDate())
@@ -83,5 +78,152 @@ public class EmployeeDTO {
 	 */
 	public static List<EmployeeDTO> fromEntities(final List<Employee> topManagers) {
 		return topManagers.stream().map(EmployeeDTO::fromEntity).toList();
+	}
+
+	public static Builder builder(final long id) {
+		return new EmployeeDTO.Builder().builder(id);
+	}
+
+	public static class Builder {
+		private long id;
+		private String firstname;
+		private String lastname;
+		private Date entryDate;
+		private Integer salary;
+		private boolean resigned;
+		private CountryDTO country;
+		private List<EmployeeDTO> employees;
+		private transient int teamSize;
+
+		public Builder builder(final long id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder firstname(final String firstname) {
+			this.firstname = firstname;
+			return this;
+		}
+
+		public Builder lastname(final String lastname) {
+			this.lastname = lastname;
+			return this;
+		}
+
+		public Builder entryDate(final Date entryDate) {
+			this.entryDate = entryDate;
+			return this;
+		}
+
+		public Builder salary(final Integer salary) {
+			this.salary = salary;
+			return this;
+		}
+
+		public Builder resigned(final boolean resigned) {
+			this.resigned = resigned;
+			return this;
+		}
+
+		public Builder country(final CountryDTO country) {
+			this.country = country;
+			return this;
+		}
+
+		public Builder employees(final List<EmployeeDTO> employees) {
+			this.employees = employees;
+			return this;
+		}
+
+		public Builder teamSize(final int teamSize) {
+			this.teamSize = teamSize;
+			return this;
+		}
+
+		public EmployeeDTO build() {
+			final var e = new EmployeeDTO();
+			e.id = id;
+			e.firstname = firstname;
+			e.lastname = lastname;
+			e.entryDate = entryDate;
+			e.salary = salary;
+			e.resigned = resigned;
+			e.country = country;
+			e.employees = employees;
+			e.teamSize = teamSize;
+			return e;
+		}
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(final long id) {
+		this.id = id;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(final String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(final String lastname) {
+		this.lastname = lastname;
+	}
+
+	public Date getEntryDate() {
+		return entryDate;
+	}
+
+	public void setEntryDate(final Date entryDate) {
+		this.entryDate = entryDate;
+	}
+
+	public Integer getSalary() {
+		return salary;
+	}
+
+	public void setSalary(final Integer salary) {
+		this.salary = salary;
+	}
+
+	public boolean isResigned() {
+		return resigned;
+	}
+
+	public void setResigned(final boolean resigned) {
+		this.resigned = resigned;
+	}
+
+	public CountryDTO getCountry() {
+		return country;
+	}
+
+	public void setCountry(final CountryDTO country) {
+		this.country = country;
+	}
+
+	public List<EmployeeDTO> getEmployees() {
+		return employees;
+	}
+
+	public void setEmployees(final List<EmployeeDTO> employees) {
+		this.employees = employees;
+	}
+
+	public Integer getTeamSize() {
+		return teamSize;
+	}
+
+	public void setTeamSize(final Integer teamSize) {
+		this.teamSize = teamSize;
 	}
 }

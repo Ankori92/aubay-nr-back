@@ -1,5 +1,7 @@
 package com.aubay.formations.nr.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -23,19 +25,18 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import lombok.extern.log4j.Log4j2;
-
 /**
  * Error Handler Catch every exceptions and send message error to client
  *
  * @author jbureau@aubay.com
  */
-@Log4j2
 @ControllerAdvice
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ErrorHandler.class);
+
 	public ResponseEntity<Object> error(final Exception ex, final HttpStatus status, final WebRequest request) {
-		log.error("Exception occured in application", ex);
+		LOG.error("Exception occured in application", ex);
 		return super.handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), status, request);
 	}
 

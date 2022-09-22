@@ -1,26 +1,30 @@
 package com.aubay.formations.nr.dto;
 
-import com.aubay.formations.nr.entities.Country;
+import java.io.Serializable;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.aubay.formations.nr.entities.Country;
 
 /**
  * Country entity
  *
  * @author jbureau@aubay.com
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class CountryDTO {
+public class CountryDTO implements Serializable {
+
+	private static final long serialVersionUID = -7468361382278959302L;
 
 	private String code;
 
 	private String labelFr;
+
+	public CountryDTO() {
+
+	}
+
+	public CountryDTO(final String code, final String labelFr) {
+		this.code = code;
+		this.labelFr = labelFr;
+	}
 
 	/**
 	 * Mapper to Entity
@@ -28,17 +32,19 @@ public class CountryDTO {
 	 * @return
 	 */
 	public Country toEntity() {
-		return Country.builder()
-				.code(code)
-				.labelFr(labelFr)
-				.build();
+		return new Country(code, labelFr);
 	}
 
 	public static CountryDTO fromEntity(final Country c) {
-		return CountryDTO.builder()
-				.code(c.getCode())
-				.labelFr(c.getLabelFr())
-				.build();
+		return new CountryDTO(c.getCode(), c.getLabelFr());
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public String getLabelFr() {
+		return labelFr;
 	}
 
 }

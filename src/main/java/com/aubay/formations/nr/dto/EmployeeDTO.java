@@ -26,8 +26,6 @@ public class EmployeeDTO implements Serializable {
 
 	private Integer salary;
 
-	private boolean resigned;
-
 	private CountryDTO country;
 
 	private List<EmployeeDTO> employees;
@@ -48,7 +46,7 @@ public class EmployeeDTO implements Serializable {
 				.lastname(lastname)
 				.entryDate(entryDate)
 				.salary(salary)
-				.resigned(resigned)
+				.resigned(false)
 				.country(country.toEntity())
 				.employees(employees == null ? new ArrayList<>() : employees.stream().map(EmployeeDTO::toEntity).toList())
 				.build();
@@ -64,7 +62,6 @@ public class EmployeeDTO implements Serializable {
 				.lastname(e.getLastname())
 				.entryDate(e.getEntryDate())
 				.salary(e.getSalary())
-				.resigned(e.isResigned())
 				.country(CountryDTO.fromEntity(e.getCountry()))
 				.employees(e.getEmployees() == null ? new ArrayList<>() : e.getEmployees().stream().map(EmployeeDTO::fromEntity).toList())
 				.teamSize(e.getTeamSize())
@@ -90,7 +87,6 @@ public class EmployeeDTO implements Serializable {
 		private String lastname;
 		private Date entryDate;
 		private Integer salary;
-		private boolean resigned;
 		private CountryDTO country;
 		private List<EmployeeDTO> employees;
 		private transient int teamSize;
@@ -120,11 +116,6 @@ public class EmployeeDTO implements Serializable {
 			return this;
 		}
 
-		public Builder resigned(final boolean resigned) {
-			this.resigned = resigned;
-			return this;
-		}
-
 		public Builder country(final CountryDTO country) {
 			this.country = country;
 			return this;
@@ -147,7 +138,6 @@ public class EmployeeDTO implements Serializable {
 			e.lastname = lastname;
 			e.entryDate = entryDate;
 			e.salary = salary;
-			e.resigned = resigned;
 			e.country = country;
 			e.employees = employees;
 			e.teamSize = teamSize;
@@ -193,14 +183,6 @@ public class EmployeeDTO implements Serializable {
 
 	public void setSalary(final Integer salary) {
 		this.salary = salary;
-	}
-
-	public boolean isResigned() {
-		return resigned;
-	}
-
-	public void setResigned(final boolean resigned) {
-		this.resigned = resigned;
 	}
 
 	public CountryDTO getCountry() {

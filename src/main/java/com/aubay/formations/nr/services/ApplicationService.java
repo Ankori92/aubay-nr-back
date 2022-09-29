@@ -29,6 +29,9 @@ public class ApplicationService {
 	private AuthentHelper authentHelper;
 
 	@Autowired
+	private EmployeeService employeeService;
+
+	@Autowired
 	private UserRepository userRepository;
 
 	/**
@@ -39,7 +42,7 @@ public class ApplicationService {
 	public User whoami() {
 		final var authenticatedUserId = authentHelper.getUsername();
 		final var authenticatedUser = userRepository.getReferenceById(authenticatedUserId);
-		Hibernate.initialize(authenticatedUser);
+		employeeService.hibernateRecursiveInitialization(authenticatedUser.getEmployee());
 		return authenticatedUser;
 	}
 

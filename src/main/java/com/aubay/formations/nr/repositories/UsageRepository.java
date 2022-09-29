@@ -13,4 +13,6 @@ import com.aubay.formations.nr.entities.Usage;
 @Repository
 public interface UsageRepository extends JpaRepository<Usage, String> {
 
+	void deleteByUri(String uri);
+
 }

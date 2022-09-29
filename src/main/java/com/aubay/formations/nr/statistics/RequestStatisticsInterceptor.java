@@ -67,7 +67,8 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 		}
 		var path = "";
 		if(handler instanceof final HandlerMethod handlerMethod) {
-			path = handlerMethod.getMethodAnnotation(RequestMapping.class).path()[0];
+			final var requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
+			path = requestMapping != null && requestMapping.path().length > 0 ? requestMapping.path()[0] : "";
 		}
 		usageRepository.save(Usage.builder()
 				.uri(request.getMethod() + " " +  path)

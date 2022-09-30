@@ -3,6 +3,9 @@ package com.aubay.formations.nr.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,7 @@ public class EmployeeController {
 	 * @param Employee
 	 * @return Updated employee
 	 */
+	@CacheEvict(value = "employees", allEntries = true)
 	@PostMapping("/employees")
 	public void updateEmployee(@RequestBody final EmployeeDTO employeeDto) {
 		employeeService.saveEmployee(employeeDto.toEntity());
@@ -41,6 +45,7 @@ public class EmployeeController {
 	 *
 	 * @return
 	 */
+	@Cacheable("employees")
 	@GetMapping("/employees/{id}")
 	public EmployeeDTO getManager(
 			@RequestParam(value = "filterResigned", defaultValue = "false") final boolean filterResigned,
@@ -54,6 +59,7 @@ public class EmployeeController {
 	 *
 	 * @return
 	 */
+	@Cacheable("topemployees")
 	@GetMapping("/employees/top")
 	public List<EmployeeDTO> getTopManagers() {
 		return EmployeeDTO.fromEntities(employeeService.getTopManagers());
@@ -64,8 +70,17 @@ public class EmployeeController {
 	 *
 	 * @return
 	 */
+	@Cacheable("countries")
 	@GetMapping("/countries")
 	public List<Country> getCountries() {
 		return employeeService.getCountries();
+	}
+
+	/**
+	 * Clear Spring caches
+	 */
+	@CacheEvict(value = { "countries", "topemployees", "employees" }, allEntries = true)
+	@DeleteMapping("/cache")
+	public void clearCache() {
 	}
 }

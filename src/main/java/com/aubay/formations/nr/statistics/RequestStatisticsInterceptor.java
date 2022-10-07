@@ -80,13 +80,13 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 			final Object handler, final Exception ex) throws Exception {
 
 		// Get metrics
-		final var path = getRequestMappingPath(handler);
+		final var path = getRequestMappingPath(handler, request);
 		final var duration = getDuration();
 		final var queries = getQueriesCount();
 		final var length = getResponseLength(response);
 
 		// Add this usage to BUFFER
-		BUFFER.add(new Usage(request.getMethod() + " " + path, duration, queries, length));
+		BUFFER.add(new Usage(path, duration, queries, length));
 
 		// Log metrics
 		log(request, duration, queries, length, path);
@@ -136,12 +136,14 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 	 * Get paths of Request Handler
 	 *
 	 * @param handler
+	 * @param request
 	 * @return
 	 */
-	public String getRequestMappingPath(final Object handler) {
+	public String getRequestMappingPath(final Object handler, final HttpServletRequest request) {
 		var path = "";
 		if (handler instanceof final HandlerMethod handlerMethod) {
-			path = String.join(", ", handlerMethod.getMethodAnnotation(RequestMapping.class).path());
+			path = request.getMethod() + " "
+					+ String.join(", ", handlerMethod.getMethodAnnotation(RequestMapping.class).path());
 		}
 		return path;
 	}

@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
@@ -43,10 +44,6 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 
 	private static final List<Usage> BUFFER = new ArrayList<>();
 
-	private static final int MAX_BUFFER_SIZE = 1000; // Trigger batch saving
-
-	private static final int BATCH_SIZE = 100; // Chunk size when batching INSERT
-
 	private final ThreadLocal<Long> executionTime = new ThreadLocal<>();
 
 	@Autowired
@@ -55,70 +52,149 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
+	@Value("${statistics.buffer.size:1000}")
+	private int bufferSize;
+
+	@Value("${statistics.batching.size:100}")
+	private int batchingSize;
+
+	@Value("${statistics.metrics.logs.enabled:true}")
+	private boolean logsEnabled;
+
 	/**
 	 * Before each API execution, start counters
 	 */
 	@Override
 	public boolean preHandle(final HttpServletRequest req, final HttpServletResponse res, final Object handler)
 			throws Exception {
-		executionTime.set(System.currentTimeMillis());
-		hibernateStatisticsInterceptor.startCounter();
+		beginCounters();
 		return true;
 	}
 
 	/**
-	 * After each API execution, collect statistics<br />
-	 * Trigger asynchronous saving when MAX_BUFFER_SIZE is achieved.
-	 * @formatter:off
+	 * After each API execution, collect metrics<br />
+	 * Trigger asynchronous saving when "bufferSize" is achieved.
 	 */
 	@Override
 	public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response,
 			final Object handler, final Exception ex) throws Exception {
-		final var duration = (int) (System.currentTimeMillis() - executionTime.get());
-		final var queries = hibernateStatisticsInterceptor.getQueryCount().intValue();
-		hibernateStatisticsInterceptor.clearCounter();
-		executionTime.remove();
+
+		// Get metrics
+		final var path = getRequestMappingPath(handler);
+		final var duration = getDuration();
+		final var queries = getQueriesCount();
+		final var length = getResponseLength(response);
+
+		// Add this usage to BUFFER
+		BUFFER.add(new Usage(request.getMethod() + " " + path, duration, queries, length));
+
+		// Log metrics
+		log(request, duration, queries, length, path);
+
+		// Persist current usages in BUFFER
+		if (BUFFER.size() >= bufferSize) {
+			persistsUsages();
+		}
+
+		// Clear thread specific data
+		postTreatments();
+	}
+
+	/**
+	 * Get queries count for this request
+	 *
+	 * @return queries count
+	 */
+	public int getQueriesCount() {
+		return hibernateStatisticsInterceptor.getQueryCount().intValue();
+	}
+
+	/**
+	 * Get duration of this request
+	 *
+	 * @return number of milliseconds since begin of this request
+	 */
+	public int getDuration() {
+		return (int) (System.currentTimeMillis() - executionTime.get());
+	}
+
+	/**
+	 * Get response length
+	 *
+	 * @param response
+	 * @return length of the response, in Bytes
+	 */
+	public int getResponseLength(final HttpServletResponse response) {
 		var length = 0;
 		if (response instanceof final ContentCachingResponseWrapper cachedResponse) {
 			length = cachedResponse.getContentSize();
 		}
-		var path = "";
-		if(handler instanceof final HandlerMethod handlerMethod) {
-			final var requestMapping = handlerMethod.getMethodAnnotation(RequestMapping.class);
-			path = requestMapping != null && requestMapping.path().length > 0 ? requestMapping.path()[0] : "";
-		}
-		final var usage = new Usage(request.getMethod() + " " +  path, duration, queries, length);
-		BUFFER.add(usage);
-		if(BUFFER.size() >= MAX_BUFFER_SIZE) {
-			persistsUsages();
-		}
-		LOG.info("[Time: {} ms] [Queries: {}] {} {}", duration, queries, request.getMethod(), request.getRequestURI());
+		return length;
 	}
 
 	/**
-	 * Asynchronous Usages Saving
-	 * Batching inserts with BATCH_SIZE
-	 * @formatter:on
+	 * Get paths of Request Handler
+	 *
+	 * @param handler
+	 * @return
+	 */
+	public String getRequestMappingPath(final Object handler) {
+		var path = "";
+		if (handler instanceof final HandlerMethod handlerMethod) {
+			path = String.join(", ", handlerMethod.getMethodAnnotation(RequestMapping.class).path());
+		}
+		return path;
+	}
+
+	/**
+	 * Trace metrics about this request, if logs are enabled
+	 *
+	 * @param request  of this request
+	 * @param duration of this request
+	 * @param queries  realized in this request
+	 * @param length   of response of this request
+	 * @param path     of the handler of this request
+	 */
+	public void log(final HttpServletRequest request, final int duration, final int queries, final int length,
+			final String path) {
+		if (logsEnabled && LOG.isInfoEnabled()) {
+			LOG.info("[URI : {} {}] [Handler : {}][Request duration: {} ms][SQL queries: {}] [Response weight: {} ko]",
+					request.getMethod(), request.getRequestURI(), path, duration, queries, length / 1000);
+		}
+	}
+
+	/**
+	 * Asynchronous Usages Saving<br />
+	 * Batching inserts with batchingSize
 	 */
 	public void persistsUsages() {
+		// Run treatment on executor (Asynchronous saving)
 		EXECUTOR.submit(() -> {
+			// Create entity manager
 			final var em = entityManagerFactory.createEntityManager();
+			// Get usages to be saved, clear the buffer
 			final List<Usage> chunk = new ArrayList<>(BUFFER);
 			BUFFER.clear();
+			// Start saving
 			EntityTransaction tx = null;
 			try {
+				// Configure batching (Save "batchingSize" usages in ONE insert)
+				em.unwrap(Session.class).setJdbcBatchSize(batchingSize);
+				// New transaction (can be rolled back)
 				tx = em.getTransaction();
-				em.unwrap(Session.class).setJdbcBatchSize(BATCH_SIZE);
 				tx.begin();
+				// Save each usages, flush and clear when batchingSize is achieved
 				for (var i = 0; i < chunk.size(); i++) {
-					if (i > 0 && i % BATCH_SIZE == 0) {
+					if (i > 0 && i % batchingSize == 0) {
 						em.flush();
 						em.clear();
 					}
 					em.persist(chunk.get(i));
 				}
+				// Commit when all usages are saved
 				tx.commit();
 			} catch (final PersistenceException e) {
+				// When errors, rollback the transaction and restore unsaved chunk in buffer
 				tx.rollback();
 				LOG.error("Error when batching save usages", e);
 				BUFFER.addAll(chunk);
@@ -128,10 +204,36 @@ public class RequestStatisticsInterceptor implements AsyncHandlerInterceptor {
 		});
 	}
 
+	/**
+	 * Start counters
+	 */
+	public void beginCounters() {
+		hibernateStatisticsInterceptor.startCounter();
+		executionTime.set(System.currentTimeMillis());
+	}
+
+	/**
+	 * Clear counters and thread specific data (Prevent Memory Leaks)<br />
+	 * Detect memory leaks
+	 */
+	public void postTreatments() {
+		// Clear counters
+		hibernateStatisticsInterceptor.clearCounter();
+		executionTime.remove();
+		// Prevent memory leak when massive errors
+		if (BUFFER.size() >= 10000) {
+			BUFFER.clear();
+			LOG.warn("========= AUBAY METRICS =========");
+			LOG.warn("WARNING : Too many \"usages\" in buffer");
+			LOG.warn("Buffer have been cleared to prevent memory leaks");
+			LOG.warn("Please verify usage saving");
+			LOG.warn("=================================");
+		}
+	}
+
 	@Override
 	public void afterConcurrentHandlingStarted(final HttpServletRequest request, final HttpServletResponse response,
 			final Object handler) throws Exception {
-		hibernateStatisticsInterceptor.clearCounter();
-		executionTime.remove();
+		postTreatments();
 	}
 }

@@ -10,14 +10,20 @@
 		<relativePath />
 	</parent>
 	<groupId>com.aubay.formations</groupId>
-	<artifactId>sensibilisation-nr</artifactId>
+	<artifactId>sensibilisation-nr-back</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>Sensibilisation NR</name>
+	<name>Sensibilisation NR Backend</name>
 	<description>Travaux pratiques de mise en application des bonnes pratiques NR</description>
+
 	<properties>
 		<java.version>17</java.version>
+		<openapi.api.name>${project.name}</openapi.api.name>
+		<openapi.api.version>${project.version}</openapi.api.version>
+		<openapi.api.description>${project.description}</openapi.api.description>
+		<openapi.api.package>com.aubay.formations.nr.rest</openapi.api.package>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -41,7 +47,94 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- Swagger -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
+		<!-- Needed by openapi plugin codegen-->
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>17</source>
+					<target>17</target>
+				</configuration>
+			</plugin>
+			<!--
+				Plugin that provides API-first development using openapi generator
+				that generate API endpoints from OpenAPI yaml file
+			-->
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>5.1.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>
+								${project.basedir}/src/main/resources/swagger/api.yaml
+							</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>${openapi.api.package}</apiPackage>
+							<modelPackage>${openapi.api.package}.model</modelPackage>
+							<supportingFilesToGenerate>
+								ApiUtil.java
+							</supportingFilesToGenerate>
+							<configOptions>
+								<delegatePattern>true</delegatePattern>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
+				Plugin that generates all maven properties in a file
+				that can be used in java code
+			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>write-project-properties</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.build.outputDirectory}/swagger.properties</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 	<repositories>
 		<repository>
 			<id>spring-milestones</id>

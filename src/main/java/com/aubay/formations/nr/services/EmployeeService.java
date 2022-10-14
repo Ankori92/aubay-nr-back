@@ -16,8 +16,8 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.aubay.formations.nr.entities.Country;
-import com.aubay.formations.nr.entities.Employee;
+import com.aubay.formations.nr.entities.CountryEntity;
+import com.aubay.formations.nr.entities.EmployeeEntity;
 import com.aubay.formations.nr.repositories.CountryRepository;
 import com.aubay.formations.nr.repositories.EmployeeRepository;
 import com.aubay.formations.nr.utils.Utils;
@@ -45,7 +45,7 @@ public class EmployeeService {
 	 * @param onlyDirectTeam
 	 * @return
 	 */
-	public Employee getEmployee(final long id, final boolean filterResigned, final boolean onlyDirectTeam) {
+	public EmployeeEntity findEmployee(final long id, final boolean onlyDirectTeam) {
 		final var employee = employeeRepository.getReferenceById(id);
 		initializeEmployee(employee, onlyDirectTeam);
 		return employee;
@@ -57,7 +57,7 @@ public class EmployeeService {
 	 * @param employee
 	 * @return saved employee
 	 */
-	public void saveEmployee(final Employee employee) {
+	public void saveEmployee(final EmployeeEntity employee) {
 		final var original = employeeRepository.getReferenceById(employee.getId());
 		employee.setManager(original.getManager());
 		employeeRepository.save(employee);
@@ -68,14 +68,14 @@ public class EmployeeService {
 	 *
 	 * @return Manager list
 	 */
-	public List<Employee> getTopManagers() {
+	public List<EmployeeEntity> getTopManagers() {
 		final var employees = employeeRepository.findByManagerNullAndResignedFalse();
-		final var employeesId = employees.stream().map(Employee::getId).toList();
+		final var employeesId = employees.stream().map(EmployeeEntity::getId).toList();
 		final var relations = employeeRepository.findEmployeesIdBelow(employeesId);
 		final var allRelations = analyzeRelations(relations);
 		final var countries = countryRepository
 				.findAllById(employees.stream().map(e -> e.getCountry().getCode()).toList());
-		final var countriesById = Utils.mapElementsById(countries, Country::getCode);
+		final var countriesById = Utils.mapElementsById(countries, CountryEntity::getCode);
 		employees.stream().forEach(e -> {
 			e.setEmployees(new ArrayList<>());
 			e.setCountry(countriesById.get(e.getCountry().getCode()));
@@ -94,7 +94,7 @@ public class EmployeeService {
 	 * @param manager        not initialized
 	 * @param onlyDirectTeam
 	 */
-	public void initializeEmployee(final Employee manager, final boolean onlyDirectTeam) {
+	public void initializeEmployee(final EmployeeEntity manager, final boolean onlyDirectTeam) {
 		initializeEmployees(Arrays.asList(manager), onlyDirectTeam);
 	}
 
@@ -108,9 +108,9 @@ public class EmployeeService {
 	 * @param managers       not initialized
 	 * @param onlyDirectTeam
 	 */
-	public void initializeEmployees(final List<Employee> managers, final boolean onlyDirectTeam) {
+	public void initializeEmployees(final List<EmployeeEntity> managers, final boolean onlyDirectTeam) {
 		// Get all concerned Employees (ONE SHOT QUERY)
-		final var employeesId = managers.stream().map(Employee::getId).toList();
+		final var employeesId = managers.stream().map(EmployeeEntity::getId).toList();
 		List<Map<String, Object>> allEmpData = null;
 		List<Map<String, Object>> allRelations = null;
 		if (onlyDirectTeam) {
@@ -128,7 +128,7 @@ public class EmployeeService {
 		final var relations = analyzeRelations(onlyDirectTeam ? allRelations : allEmpData);
 
 		// Organize all teams and set final team
-		for (final Employee manager : managers) {
+		for (final EmployeeEntity manager : managers) {
 			final var managerId = manager.getId();
 			manager.setCountry(allCountries.get(manager.getCountry().getCode()));
 			manager.setEmployees(buildTeam(managerId, allEmpData, relations, allCountries, onlyDirectTeam));
@@ -136,7 +136,7 @@ public class EmployeeService {
 		}
 	}
 
-	public Map<String, Country> findCountries(final List<Employee> managers,
+	public Map<String, CountryEntity> findCountries(final List<EmployeeEntity> managers,
 			final List<Map<String, Object>> allEmpData) {
 		// Countries in team
 		final var countriesIdTeam = allEmpData.stream().map(this::getCountryId);
@@ -145,7 +145,7 @@ public class EmployeeService {
 		// Find countries in DB
 		final var countriesId = Stream.concat(countriesIdTeam, countriesIdEmp).distinct().toList();
 		final var countries = countryRepository.findAllById(countriesId);
-		return Utils.mapElementsById(countries, Country::getCode);
+		return Utils.mapElementsById(countries, CountryEntity::getCode);
 	}
 
 	/**
@@ -178,11 +178,11 @@ public class EmployeeService {
 	 * @param onlyDirectTeam
 	 * @return
 	 */
-	private ArrayList<Employee> buildTeam(final long id, final List<Map<String, Object>> allEmpData,
-			final Map<Long, Set<Long>> relations, final Map<String, Country> allCountries,
+	private ArrayList<EmployeeEntity> buildTeam(final long id, final List<Map<String, Object>> allEmpData,
+			final Map<Long, Set<Long>> relations, final Map<String, CountryEntity> allCountries,
 			final boolean onlyDirectTeam) {
 		final var employeesInThisTeam = relations.getOrDefault(id, new HashSet<Long>());
-		final var result = new ArrayList<Employee>();
+		final var result = new ArrayList<EmployeeEntity>();
 		for (final Long employeeId : employeesInThisTeam) {
 			final var empData = getEmpData(allEmpData, employeeId);
 			if (!isResigned(empData)) {
@@ -193,7 +193,7 @@ public class EmployeeService {
 	}
 
 	/**
-	 * Build Employee from empData
+	 * Build EmployeeEntity from empData
 	 * @formatter:off
 	 * @param empData
 	 * @param allEmpData
@@ -202,10 +202,10 @@ public class EmployeeService {
 	 * @param onlyDirectTeam
 	 * @return built Employee
 	 */
-	private Employee buildEmployee(final Map<String, Object> empData, final List<Map<String, Object>> allEmpData,
-			final Map<Long, Set<Long>> relations, final Map<String, Country> allCountries, final boolean onlyDirectTeam) {
+	private EmployeeEntity buildEmployee(final Map<String, Object> empData, final List<Map<String, Object>> allEmpData,
+			final Map<Long, Set<Long>> relations, final Map<String, CountryEntity> allCountries, final boolean onlyDirectTeam) {
 		final var employeeId = getId(empData);
-		return Employee.builder(employeeId)
+		return EmployeeEntity.builder(employeeId)
 				.firstname(getFirstname(empData))
 				.lastname(getLastname(empData))
 				.entryDate(getEntryDate(empData))
@@ -213,7 +213,7 @@ public class EmployeeService {
 				.salary(getSalary(empData))
 				.country(allCountries.get(getCountryId(empData)))
 				.teamSize(computeTeamSize(employeeId, relations))
-				.employees(onlyDirectTeam ? new ArrayList<Employee>() : buildTeam(employeeId, allEmpData, relations, allCountries, onlyDirectTeam))
+				.employees(onlyDirectTeam ? new ArrayList<EmployeeEntity>() : buildTeam(employeeId, allEmpData, relations, allCountries, onlyDirectTeam))
 				.build();
 	}
 
@@ -247,9 +247,9 @@ public class EmployeeService {
 	 *
 	 * @param employees
 	 */
-	public void filterResignedEmployees(final Employee employee) {
-		final var result = new ArrayList<Employee>();
-		for (final Employee e : employee.getEmployees()) {
+	public void filterResignedEmployees(final EmployeeEntity employee) {
+		final var result = new ArrayList<EmployeeEntity>();
+		for (final EmployeeEntity e : employee.getEmployees()) {
 			if (!e.isResigned()) {
 				filterResignedEmployees(e);
 				result.add(e);
@@ -263,7 +263,7 @@ public class EmployeeService {
 	 *
 	 * @return all countries
 	 */
-	public List<Country> getCountries() {
+	public List<CountryEntity> getCountries() {
 		return countryRepository.findAll();
 	}
 

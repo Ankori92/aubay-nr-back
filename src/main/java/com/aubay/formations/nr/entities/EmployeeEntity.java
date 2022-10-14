@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "employees")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "manager" /* Infinite loop with "employees" */ })
-public class Employee implements Serializable {
+public class EmployeeEntity implements Serializable {
 
 	private static final long serialVersionUID = 8413415934172116852L;
 
@@ -47,19 +47,19 @@ public class Employee implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "country_id")
-	private Country country;
+	private CountryEntity country;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "manager_id")
-	private Employee manager;
+	private EmployeeEntity manager;
 
 	@OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
-	private List<Employee> employees;
+	private List<EmployeeEntity> employees;
 
 	private transient int teamSize;
 
 	public static Builder builder(final long id) {
-		return new Employee.Builder().builder(id);
+		return new EmployeeEntity.Builder().builder(id);
 	}
 
 	public static class Builder {
@@ -69,9 +69,9 @@ public class Employee implements Serializable {
 		private Date entryDate;
 		private Integer salary;
 		private boolean resigned;
-		private Country country;
-		private Employee manager;
-		private List<Employee> employees;
+		private CountryEntity country;
+		private EmployeeEntity manager;
+		private List<EmployeeEntity> employees;
 		private transient int teamSize;
 
 		public Builder builder(final long id) {
@@ -104,17 +104,17 @@ public class Employee implements Serializable {
 			return this;
 		}
 
-		public Builder country(final Country country) {
+		public Builder country(final CountryEntity country) {
 			this.country = country;
 			return this;
 		}
 
-		public Builder manager(final Employee manager) {
+		public Builder manager(final EmployeeEntity manager) {
 			this.manager = manager;
 			return this;
 		}
 
-		public Builder employees(final List<Employee> employees) {
+		public Builder employees(final List<EmployeeEntity> employees) {
 			this.employees = employees;
 			return this;
 		}
@@ -124,8 +124,8 @@ public class Employee implements Serializable {
 			return this;
 		}
 
-		public Employee build() {
-			final var e = new Employee();
+		public EmployeeEntity build() {
+			final var e = new EmployeeEntity();
 			e.id = id;
 			e.firstname = firstname;
 			e.lastname = lastname;
@@ -164,15 +164,15 @@ public class Employee implements Serializable {
 		return resigned;
 	}
 
-	public Country getCountry() {
+	public CountryEntity getCountry() {
 		return country;
 	}
 
-	public Employee getManager() {
+	public EmployeeEntity getManager() {
 		return manager;
 	}
 
-	public List<Employee> getEmployees() {
+	public List<EmployeeEntity> getEmployees() {
 		return employees;
 	}
 
@@ -180,15 +180,15 @@ public class Employee implements Serializable {
 		return teamSize;
 	}
 
-	public void setManager(final Employee manager) {
+	public void setManager(final EmployeeEntity manager) {
 		this.manager = manager;
 	}
 
-	public void setEmployees(final List<Employee> employees) {
+	public void setEmployees(final List<EmployeeEntity> employees) {
 		this.employees = employees;
 	}
 
-	public void setCountry(final Country country) {
+	public void setCountry(final CountryEntity country) {
 		this.country = country;
 	}
 
@@ -214,7 +214,7 @@ public class Employee implements Serializable {
 		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
-		final var other = (Employee) obj;
+		final var other = (EmployeeEntity) obj;
 		return id == other.id;
 	}
 }

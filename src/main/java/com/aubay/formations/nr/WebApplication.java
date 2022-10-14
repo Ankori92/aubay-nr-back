@@ -4,11 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Application Runner
@@ -37,12 +34,4 @@ public class WebApplication implements WebMvcConfigurer {
 		registry.addMapping("/**").allowedOrigins(frontendUrl).allowedMethods("*").allowCredentials(true);
 	}
 
-	/**
-	 * Singleton for Jackson Object Mapper (JSON Serialization/Deserialization)
-	 * Injection ready
-	 */
-	@Bean
-	public ObjectMapper getObjectMapper() {
-		return new ObjectMapper();
-	}
 }

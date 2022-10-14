@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "countries")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-public class Country implements Serializable {
+public class CountryEntity implements Serializable {
 
 	private static final long serialVersionUID = -9060115814034824006L;
 
@@ -26,10 +26,10 @@ public class Country implements Serializable {
 
 	private String labelFr;
 
-	public Country() {
+	public CountryEntity() {
 	}
 
-	public Country(final String code, final String labelFr) {
+	public CountryEntity(final String code, final String labelFr) {
 		this.code = code;
 		this.labelFr = labelFr;
 	}
@@ -50,7 +50,7 @@ public class Country implements Serializable {
 		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
-		final var other = (Country) obj;
+		final var other = (CountryEntity) obj;
 		return Objects.equals(code, other.code);
 	}
 

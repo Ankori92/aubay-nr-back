@@ -39,7 +39,7 @@ public class User implements UserDetails {
 
 	@ManyToOne
 	@JoinColumn(name = "employee_id")
-	private Employee employee;
+	private EmployeeEntity employee;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "username"))
@@ -49,7 +49,7 @@ public class User implements UserDetails {
 	public User() {
 	}
 
-	public User(final String username, final String password, final Employee employee,
+	public User(final String username, final String password, final EmployeeEntity employee,
 			final List<GrantedAuthority> authorities) {
 		this.username = username;
 		this.password = password;
@@ -67,7 +67,7 @@ public class User implements UserDetails {
 		return password;
 	}
 
-	public Employee getEmployee() {
+	public EmployeeEntity getEmployee() {
 		return employee;
 	}
 

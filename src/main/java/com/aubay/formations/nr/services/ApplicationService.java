@@ -11,7 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.stereotype.Service;
 
-import com.aubay.formations.nr.entities.Employee;
+import com.aubay.formations.nr.entities.EmployeeEntity;
 import com.aubay.formations.nr.entities.User;
 import com.aubay.formations.nr.repositories.UserRepository;
 import com.aubay.formations.nr.utils.AuthentHelper;
@@ -53,7 +53,7 @@ public class ApplicationService {
 	 * @param authorities
 	 * @formatter:off
 	 */
-	public void createAccount(final String username, final String password, final Employee employee, final GrantedAuthority... authorities) {
+	public void createAccount(final String username, final String password, final EmployeeEntity employee, final GrantedAuthority... authorities) {
 		userRepository.save(new User(username, PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password), employee, Arrays.asList(authorities)));
 	}
 }

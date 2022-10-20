@@ -3,8 +3,6 @@ package com.aubay.formations.nr.config;
 import javax.sql.DataSource;
 import javax.transaction.Transactional;
 
-import com.aubay.formations.nr.repositories.UserRepository;
-import com.aubay.formations.nr.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +19,8 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.transaction.CannotCreateTransactionException;
 
+import com.aubay.formations.nr.repositories.UserRepository;
+import com.aubay.formations.nr.services.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**

@@ -185,7 +185,42 @@ paths:
         - cache
       responses:
         200:
-          description: Cache cleaned
+          description: Cache cleaned  
+          
+          
+  /feedbacks:
+    post:
+      summary: Create a feedback
+      operationId: createFeedback
+      tags:
+        - feedbacks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+      responses:
+        200:
+          description: Created feedback
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+        400:
+          description: Missing/wrong parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
 components:
   schemas:
     Employee:
@@ -225,6 +260,17 @@ components:
         labelFr:
           type: string
         labelEn:
+          type: string
+
+    Feedback:
+      type: object
+      required:
+        - username
+        - content
+      properties:
+        username:
+          type: string
+        content:
           type: string
 
     Error:

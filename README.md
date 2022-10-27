@@ -5,49 +5,27 @@ Branches principales :<br />
 - La branche "**tp**" contient le code qui sera remis aux participants à la formation, c'est cette version de l'application qui contient les mauvaises pratiques à détecter et corriger.<br />
 - La branche "**master**" se base sur la version "tp" et contient plusieurs commits de correction, cette version pourra être présentée partiellement à la fin du TP pour présenter des problèmes et quelques solutions associées. Cette version devra être fournie en intégralité aux participants après leur formation pour qu'ils puisse étudier plus en détail le fonctionnement.<br />
 
-# Getting Started
 Branches secondaires :<br />
 - La branche "**multimodule**" contient une version "master" découpée en multi-modules maven. A voir si ce développement est intéressant ou pas.<br />
 - La branche "**codefactory**" contient une version "master" servant de base pour le développement du socle pour CODE FACTORY. Elle intègre aussi des développements OpenAPI CodeGen et pour une connexion MongoDB.
 
-### Reference Documentation
-For further reference, please consider the following sections:
 ## Généralités
 Durée totale du TP : 1 jour
 
-
-
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/3.0.0-SNAPSHOT/maven-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/3.0.0-SNAPSHOT/maven-plugin/reference/html/#build-image)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/3.0.0-SNAPSHOT/reference/htmlsingle/#web)
-* [Spring Security](https://docs.spring.io/spring-boot/docs/3.0.0-SNAPSHOT/reference/htmlsingle/#web.security)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.0.0-SNAPSHOT/reference/htmlsingle/#data.sql.jpa-and-spring-data)
 Matériel nécessaire :
 -	1 PC par participant<br />
 -	1 PC formateur, avec une base de données H2 accessible par les PC des participants<br />
 -	Réseau LAN entre participants et formateur<br />
 -	SSD externe contenant les documents, le code source et les applications nécessaires
 
-### Guides
-The following guides illustrate how to use some features concretely:
 ## Préparation de la formation (à faire par le formateur) :
 -	Supprimer toutes traces d’anciennes formations sur les PC des participants (C:\formation-nr\)<br />
 -	Déposer le dossier formation-nr sur chacun des PC des participants (C:\formation-nr\)<br />
 -	Configurer le chemin d’accès à la base de données depuis chaque PC (application.properties)<br />
 -	Installer H2 sur le PC du formateur et charger les données (Le chargement de la hiérarchie doit prendre 5~10 secondes avec DEBUG désactivé, depuis les PC des participants, réactiver le mode DEBUG après test. Changer la volumétrie de donner à charger dans ApplicationController via DataGenerator.generateEmployees(15, 6). 15 est le nombre maximum d’employés par équipe, et 6 la profondeur maximale de la hierarchie).
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Securing a Web Application](https://spring.io/guides/gs/securing-web/)
-* [Spring Boot and OAuth2](https://spring.io/guides/tutorials/spring-boot-oauth2/)
-* [Authenticating a User with LDAP](https://spring.io/guides/gs/authenticating-ldap/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 ## Prérequis
 Ce TP est une application développée en Java 17, Angular 14, Spring Boot 2 et Hibernate 5.
-
-
 Il est impératif d’avoir des compétences en Java et Angular (Toutes versions), et très fortement recommandé d’avoir une première expérience avec Spring Boot et Hibernate.
 
 ## Objectif du TP

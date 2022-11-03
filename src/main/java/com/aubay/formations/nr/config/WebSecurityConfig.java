@@ -65,7 +65,7 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 		// API Security
-		http.authorizeRequests(authorize -> authorize.antMatchers("/**").authenticated());
+		http.authorizeRequests(authorize -> authorize.antMatchers("/tp/**").permitAll().antMatchers("/**").authenticated());
 		// Handle access rejections
 		http.exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 		// Enable CORS

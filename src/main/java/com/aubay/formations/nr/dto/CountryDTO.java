@@ -1,6 +1,7 @@
 package com.aubay.formations.nr.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.aubay.formations.nr.entities.Country;
 
@@ -45,6 +46,16 @@ public class CountryDTO implements Serializable {
 
 	public String getLabelFr() {
 		return labelFr;
+	}
+
+
+	/**
+	 * Mapper from entities
+	 * @param countries
+	 * @return
+	 */
+	public static List<CountryDTO> fromEntities(final List<Country> countries) {
+		return countries.stream().map(CountryDTO::fromEntity).toList();
 	}
 
 }

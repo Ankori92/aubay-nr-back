@@ -294,11 +294,12 @@ Certaines dépendances techniques ne sont même pas utilisées, comme jackson-da
 </table>
 
 
-### Les API ne remontent que les informations nécessaires
+### Optimiser les API
 Chaque employé contient un flag indiquant qu’il a démissionné (resigned), cette donnée n’est pas utilisée par le frontend (Elle vaut toujours « false », sinon le serveur l’aurait filtré). Il est souhaitable de retirer ce champ de l'entité (Et modifier les requêtes en conséquence), ou de créer un DTO ne contenant pas ce champ, ou d'ajouter @JsonIgnore sur les champs qui ne sont pas destinés à être envoyés par l'API (@JsonIgnore indique au sérialiseur JSON -jackson- de ne pas sérialiser ce champ).<br />
 De même, les User contiennent le flag "enabled","accountNonExpired", "accountNonLocked" et "credentialsNonExpired" qui ne sont pas utile au front. Rajouter @JsonIgnore permet de facilement retirer ces données des API.<br />
 Concernant la consultation des statistiques, l’ensemble des données conservées sont envoyées en détail à Angular, pour que celui-ci les agrège, analyse et présente quelques valeurs. Cela représente une quantité de données très, très importante une fois en production (chaque action de chaque utilisateur ajoute une centaine d’octets aux statistiques, soit 20Mo pour quelques 100 utilisateurs qui feraient 100 requêtes par jour pendant un mois, 240Mo si les statistiques n’ont pas été nettoyées de l’année, etc). Il serait préférable de laisser l’analyse des données au serveur et à la base de données pour limiter les gros flux de données. Pour aller plus loin, il serait intéressant de consolider les statistiques via un batch, pour transformer quelques milliers de lignes en une seule consolidée, et ainsi ne plus avoir de problème de volumétrie liée aux statistiques.<br />
 Aussi, la simple navigation entre les pages de l’application rafraichi systématiquement les données des pages. Or il est peu probable que certaines données aient été modifiées, ou leur modification peut être considérée négligeable (comme les statistiques). Il serait donc préférable de conserver en cache certaines données, et proposer un bouton si l’utilisateur souhaite rafraîchir volontairement les données.
+Enfin, il est possible d'optimiser le chargement de certaines pages en fusionnant certaines API. Par exemple, la page d'accueil fait appel à /employees/top et /countries que l'ont peut fusionner en une nouvelle API /home chargée de fournir l'ensemble des données nécessaire à l'affichage initial de la page d'accueil. Attention cependant, cette règle peut aller à l'encontre d'autres bonnes pratiques consistant par exemple à diminuer la complexité et favoriser la réutilisabilité du code en préférant des plus petits traitements possibles (On pourra facilement réutiliser /countries, alors que /home ne pourra pas être réutilisé).
 
 <table border="1">
 	<tr>
@@ -327,6 +328,12 @@ Aussi, la simple navigation entre les pages de l’application rafraichi systém
 	</tr>
 	<tr>
 		<td>La navigation d’une page à l’autre rafraichi systématiquement le contenu des pages</td>
+		<td>2</td>
+		<td>3</td>
+		<td>4</td>
+	</tr>
+	<tr>
+		<td>Regrouper les API pour limiter le nombre de requêtes</td>
 		<td>2</td>
 		<td>3</td>
 		<td>4</td>

@@ -1,7 +1,5 @@
 package com.aubay.formations.nr.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aubay.formations.nr.dto.CountryDTO;
 import com.aubay.formations.nr.dto.EmployeeDTO;
-import com.aubay.formations.nr.entities.Country;
+import com.aubay.formations.nr.dto.HomeInfoDTO;
 import com.aubay.formations.nr.services.EmployeeService;
 
 /**
@@ -55,31 +54,22 @@ public class EmployeeController {
 	}
 
 	/**
-	 * Get TOP employees
-	 *
-	 * @return
-	 */
-	@Cacheable("topemployees")
-	@GetMapping("/employees/top")
-	public List<EmployeeDTO> getTopManagers() {
-		return EmployeeDTO.fromEntities(employeeService.getTopManagers());
-	}
-
-	/**
 	 * Get countries list
 	 *
 	 * @return
 	 */
-	@Cacheable("countries")
-	@GetMapping("/countries")
-	public List<Country> getCountries() {
-		return employeeService.getCountries();
+	@Cacheable("home")
+	@GetMapping("/home")
+	public HomeInfoDTO getHomeInfo() {
+		final var countries = CountryDTO.fromEntities(employeeService.getCountries());
+		final var employees = EmployeeDTO.fromEntities(employeeService.getTopManagers());
+		return new HomeInfoDTO(countries, employees);
 	}
 
 	/**
 	 * Clear Spring caches
 	 */
-	@CacheEvict(value = { "countries", "topemployees", "employees" }, allEntries = true)
+	@CacheEvict(value = { "home", "employees" }, allEntries = true)
 	@DeleteMapping("/cache")
 	public void clearCache() {
 	}

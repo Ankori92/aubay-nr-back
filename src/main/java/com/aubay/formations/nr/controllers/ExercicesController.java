@@ -1,5 +1,6 @@
 package com.aubay.formations.nr.controllers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.transaction.Transactional;
@@ -68,5 +69,30 @@ public class ExercicesController {
 			LOG.info(stat.getUri() + " : " + stat.getQueries() + " requête(s) par appel");
 		}
 		Chrono.trace("Les statistiques ont été affichées", usages.size());
+	}
+
+	@GetMapping("/catch")
+	public void avoidCatching() {
+		Chrono.start();
+		var errors = 0;
+		final var myNumbers = new ArrayList<Double>();
+		for(var i = 0 ; i < 10000 ; i++) {
+			final var number = i >= 20 ? "a" : "" + i; // 20 cas OK, le reste KO
+			try {
+				myNumbers.add(Double.valueOf(number));
+			} catch(final NumberFormatException e) {
+				LOG.error("Format des données incorrect", e); // LOG au niveau ERROR, car toutes les exceptions doivent être tracées
+				errors++;
+				////////////////////////////////////////////////////////////////
+				///////// Autres manières de gérer (ou pas) l'exception ////////
+				////////////////////////////////////////////////////////////////
+				// LOG.debug("Format des données incorrect", e); // LOG au niveau DEBUG, ce cas est fréquemment attendu sans que ça ne pose de problème /!\
+				// LOG.debug("Format des données incorrect, sans affichage de la stacktrace"); /!\ /!\
+				// Aucun log, l'exception est totalement passée sous silence /!\ /!\ /!\
+				////////////////////////////////////////////////////////////////
+			}
+		}
+		Chrono.trace("Tous les nombres ont été convertis en double, cas en erreur : " + errors);
+		myNumbers.stream().forEach(number -> LOG.info("Nombre : " + number));
 	}
 }

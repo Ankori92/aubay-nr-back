@@ -298,8 +298,10 @@ Certaines dépendances techniques ne sont même pas utilisées, comme jackson-da
 Chaque employé contient un flag indiquant qu’il a démissionné (resigned), cette donnée n’est pas utilisée par le frontend (Elle vaut toujours « false », sinon le serveur l’aurait filtré). Il est souhaitable de retirer ce champ de l'entité (Et modifier les requêtes en conséquence), ou de créer un DTO ne contenant pas ce champ, ou d'ajouter @JsonIgnore sur les champs qui ne sont pas destinés à être envoyés par l'API (@JsonIgnore indique au sérialiseur JSON -jackson- de ne pas sérialiser ce champ).<br />
 De même, les User contiennent le flag "enabled","accountNonExpired", "accountNonLocked" et "credentialsNonExpired" qui ne sont pas utile au front. Rajouter @JsonIgnore permet de facilement retirer ces données des API.<br />
 Concernant la consultation des statistiques, l’ensemble des données conservées sont envoyées en détail à Angular, pour que celui-ci les agrège, analyse et présente quelques valeurs. Cela représente une quantité de données très, très importante une fois en production (chaque action de chaque utilisateur ajoute une centaine d’octets aux statistiques, soit 20Mo pour quelques 100 utilisateurs qui feraient 100 requêtes par jour pendant un mois, 240Mo si les statistiques n’ont pas été nettoyées de l’année, etc). Il serait préférable de laisser l’analyse des données au serveur et à la base de données pour limiter les gros flux de données. Pour aller plus loin, il serait intéressant de consolider les statistiques via un batch, pour transformer quelques milliers de lignes en une seule consolidée, et ainsi ne plus avoir de problème de volumétrie liée aux statistiques.<br />
-Aussi, la simple navigation entre les pages de l’application rafraichi systématiquement les données des pages. Or il est peu probable que certaines données aient été modifiées, ou leur modification peut être considérée négligeable (comme les statistiques). Il serait donc préférable de conserver en cache certaines données, et proposer un bouton si l’utilisateur souhaite rafraîchir volontairement les données.
-Enfin, il est possible d'optimiser le chargement de certaines pages en fusionnant certaines API. Par exemple, la page d'accueil fait appel à /employees/top et /countries que l'ont peut fusionner en une nouvelle API /home chargée de fournir l'ensemble des données nécessaire à l'affichage initial de la page d'accueil. Attention cependant, cette règle peut aller à l'encontre d'autres bonnes pratiques consistant par exemple à diminuer la complexité et favoriser la réutilisabilité du code en préférant des plus petits traitements possibles (On pourra facilement réutiliser /countries, alors que /home ne pourra pas être réutilisé).
+Aussi, la simple navigation entre les pages de l’application rafraichi systématiquement les données des pages. Or il est peu probable que certaines données aient été modifiées, ou leur modification peut être considérée négligeable (comme les statistiques). Il serait donc préférable de conserver en cache certaines données, et proposer un bouton si l’utilisateur souhaite rafraîchir volontairement les données.<br />
+Il est aussi possible d'optimiser le chargement de certaines pages en fusionnant certaines API. Par exemple, la page d'accueil fait appel à /employees/top et /countries que l'ont peut fusionner en une nouvelle API /home chargée de fournir l'ensemble des données nécessaire à l'affichage initial de la page d'accueil. Attention cependant, cette règle peut aller à l'encontre d'autres bonnes pratiques consistant par exemple à diminuer la complexité et favoriser la réutilisabilité du code en préférant des plus petits traitements possibles (On pourra facilement réutiliser /countries, alors que /home ne pourra pas être réutilisé).<br />
+Les flux "text/plain" (tels que HTML, CSS, JS, JSON, XML, etc) peuvent être compressés très efficacement et représentent une partie non-négligeable des échanges avec les serveurs. Heureusement, les Frameworks serveurs et navigateurs web implémentent une compression/décompression GZIP automatique de chacun des flux. Les données sont compressées par le serveur, puis un entête "Content-Encoding: gzip" est ajouté à la réponse pour indiquer au navigateur que le flux doit être décompressé avant utilisation.<br />
+Le protocole HTTP/2 permet aussi de compresser les entêtes HTTP de manière automatique (En HTTP/1, les entêtes représentent 500 à 800 octets en texte brut), et modifie le fonctionnement du HTTP/1 en permettant le multiplexage, en d'autres mots cela permet de transmettre plusieurs flux simultanément au sein d'une même requête, et permet aussi au serveur de pousser des données. Le HTTP/3 est disponible depuis 2019 et va encore plus loin en utilisant UDP plutôt que TCP mais reste encore très marginal (On utilise habituellement TCP car il implémente des mécanismes de détection/correction des erreurs, il est en contrepartie plus lourd et moins rapide que UDP qui en est dénué).
 
 <table border="1">
 	<tr>
@@ -337,6 +339,18 @@ Enfin, il est possible d'optimiser le chargement de certaines pages en fusionnan
 		<td>2</td>
 		<td>3</td>
 		<td>4</td>
+	</tr>
+	<tr>
+		<td>Compresser les flux "plain text"</td>
+		<td>2</td>
+		<td>3</td>
+		<td>4</td>
+	</tr>
+	<tr>
+		<td>Utiliser le protocole HTTP/2</td>
+		<td>1</td>
+		<td>2</td>
+		<td>3</td>
 	</tr>
 </table>
 

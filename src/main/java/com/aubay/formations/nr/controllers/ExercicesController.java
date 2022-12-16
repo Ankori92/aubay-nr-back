@@ -1,6 +1,7 @@
 package com.aubay.formations.nr.controllers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.transaction.Transactional;
@@ -45,6 +46,25 @@ public class ExercicesController {
 			LOG.info("Employee : " + employee.getCountry().getLabelFr()); // Chacun des pays n'ayant pas été récupérés lors de la première requête, N requêtes sont exécutées ici
 		}
 		Chrono.trace("Les pays des top-managers ont été affichés", employees.size());
+	}
+
+	@GetMapping("/loop")
+	public void sqlLoop() {
+		Chrono.start();
+		final var usages = Arrays.asList( // Millions d'usages dont l'URI est de la forme "/employees/{id}"
+				Usage.builder().uri("/employees/1").build(),
+				Usage.builder().uri("/employees/2").build(),
+				Usage.builder().uri("/employees/3").build(),
+				Usage.builder().uri("/employees/4").build(),
+				Usage.builder().uri("/employees/5").build()
+				// [...]
+				);
+		for(final var usage : usages) {
+			final var employeeId = Long.valueOf(usage.getUri().substring(11));
+			final var employee = employeeRepository.getReferenceById(employeeId); // Une requête SQL pour chacun des usages de la liste
+			LOG.info("L'employé {} a été consulté", employee.getFirstname() + " " + employee.getLastname());
+		}
+		Chrono.trace("Les employés consultés ont été affichés");
 	}
 
 	@GetMapping("/sql")

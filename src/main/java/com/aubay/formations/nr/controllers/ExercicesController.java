@@ -3,7 +3,6 @@ package com.aubay.formations.nr.controllers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import javax.transaction.Transactional;
 
@@ -40,25 +39,7 @@ public class ExercicesController {
 	private UsageRepository usageRepository;
 
 	/**
-	 * Exercice 1 (10 minutes)
-	 *
-	 * Cette méthode est conçue pour afficher dans les logs le pays de chacun des top-managers.
-	 * Elle commence donc par récupérer la liste des top-managers (employees), puis boucle sur chacun d'entre-eux pour afficher le LabelFr de leur pays respectif.
-	 * Malheureusement, cet algorithme réalise une très grande quantité de requêtes SQL pour récupérer les pays de chaque top-manager.
-	 * Vous devez donc comprendre le problème et proposer une solution pour éviter de réaliser N+1 requêtes SQL.
-	 */
-	@GetMapping("/np1")
-	public void hibernateNp1Problem() {
-		Chrono.start();
-		final var employees = employeeRepository.findByManagerNullAndResignedFalse(); // La première requête récupère une liste de manager
-		for(final var employee : employees) {
-			LOG.info("Pays de l'employé " + employee.getId() + " : " + employee.getCountry().getLabelFr()); // Chacun des pays n'ayant pas été récupérés lors de la première requête, N requêtes sont exécutées ici
-		}
-		Chrono.trace("Les pays des top-managers ont été affichés", employees.size());
-	}
-
-	/**
-	 * Exercice 2 (25 minutes)
+	 * Exercice 1 (25 minutes)
 	 *
 	 * Cette méthode est conçue pour afficher dans les logs la liste des employés qui ont été consultés, par leur nom et prénom
 	 * On considère qu'un employé a été consulté quand il apparait dans la liste "usages" sous la forme "/employees/{id}".
@@ -98,7 +79,7 @@ public class ExercicesController {
 	}
 
 	/**
-	 * Exercice 3 (20 minutes)
+	 * Exercice 2 (20 minutes)
 	 *
 	 * Cette méthode est conçue pour produire puis afficher des statistiques : La moyenne de requêtes SQL exécutées par usage
 	 * Malheureusement, cette algorithme récupère l'intégralité des usages (Des milliards !) pour ensuite les filtrer.
@@ -129,7 +110,7 @@ public class ExercicesController {
 	}
 
 	/**
-	 * Exercice 4 (10 minutes)
+	 * Exercice 3 (10 minutes)
 	 *
 	 * Cette méthode est conçue pour convertir des chaines de caractères en nombre, et afficher les cas en erreur dans les logs.
 	 * Malheureusement, cet algorithme utilise les exceptions pour traiter le cas d'erreur, ce qui implique la création de la stacktrace et théoriquement son affichage dans les logs.
@@ -159,5 +140,23 @@ public class ExercicesController {
 		}
 		Chrono.trace("Tous les nombres ont été convertis en double, cas en erreur : " + errors);
 		myNumbers.stream().forEach(number -> LOG.info("Nombre : " + number));
+	}
+
+	/**
+	 * Exercice 4 (10 minutes)
+	 *
+	 * Cette méthode est conçue pour afficher dans les logs le pays de chacun des top-managers.
+	 * Elle commence donc par récupérer la liste des top-managers (employees), puis boucle sur chacun d'entre-eux pour afficher le LabelFr de leur pays respectif.
+	 * Malheureusement, cet algorithme réalise une très grande quantité de requêtes SQL pour récupérer les pays de chaque top-manager.
+	 * Vous devez donc comprendre le problème et proposer une solution pour éviter de réaliser N+1 requêtes SQL.
+	 */
+	@GetMapping("/np1")
+	public void hibernateNp1Problem() {
+		Chrono.start();
+		final var employees = employeeRepository.findByManagerNullAndResignedFalse(); // La première requête récupère une liste de manager
+		for(final var employee : employees) {
+			LOG.info("Pays de l'employé " + employee.getId() + " : " + employee.getCountry().getLabelFr()); // Chacun des pays n'ayant pas été récupérés lors de la première requête, N requêtes sont exécutées ici
+		}
+		Chrono.trace("Les pays des top-managers ont été affichés", employees.size());
 	}
 }

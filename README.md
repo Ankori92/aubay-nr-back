@@ -1,48 +1,5 @@
 ### TP NR 102
 
-## Gestion des branches du dépot
-Branches principales :<br />
-- La branche "**tp**" contient le code qui sera remis aux participants à la formation, c'est cette version de l'application qui contient les mauvaises pratiques à détecter et corriger.<br />
-- La branche "**master**" se base sur la version "tp" et contient plusieurs commits de correction, cette version pourra être présentée partiellement à la fin du TP pour présenter des problèmes et quelques solutions associées. Cette version devra être fournie en intégralité aux participants après leur formation pour qu'ils puisse étudier plus en détail le fonctionnement.<br />
-
-Branches secondaires :<br />
-- La branche "**multimodule**" contient une version "master" découpée en multi-modules maven. A voir si ce développement est intéressant ou pas.<br />
-- La branche "**codefactory**" contient une version "master" servant de base pour le développement du socle pour CODE FACTORY. Elle intègre aussi des développements OpenAPI CodeGen et pour une connexion MongoDB.
-
-## Généralités
-Durée totale du TP : 1 jour
-
-Matériel nécessaire :
--	1 PC par participant<br />
--	1 PC formateur, avec une base de données H2 accessible par les PC des participants<br />
--	Réseau LAN entre participants et formateur<br />
--	SSD externe contenant les documents, le code source et les applications nécessaires
-
-## Préparation de la formation (à faire par le formateur) :
--	Supprimer toutes traces d’anciennes formations sur les PC des participants (C:\formation-nr\)<br />
--	Déposer le dossier formation-nr sur chacun des PC des participants (C:\formation-nr\)<br />
--	Configurer le chemin d’accès à la base de données depuis chaque PC (application.properties)<br />
--	Installer H2 sur le PC du formateur et charger les données (Le chargement de la hiérarchie doit prendre 5~10 secondes avec DEBUG désactivé, depuis les PC des participants, réactiver le mode DEBUG après test. Changer la volumétrie de donner à charger dans ApplicationController via DataGenerator.generateEmployees(15, 6). 15 est le nombre maximum d’employés par équipe, et 6 la profondeur maximale de la hierarchie).
-
-## Prérequis
-Ce TP est une application développée en Java 17, Angular 14, Spring Boot 2 et Hibernate 5.
-Il est impératif d’avoir des compétences en Java et Angular (Toutes versions), et très fortement recommandé d’avoir une première expérience avec Spring Boot et Hibernate.
-
-## Objectif du TP
-Ce TP est une mise en situation d’un développeur devant une application déjà fonctionnelle, mais présentant quelques défauts de conception, de développement et de configuration.
-
-Suite à la sensibilisation qu’il a reçue, le développeur devra être capable d’identifier le maximum de mauvaises pratiques, imaginer des solutions et éventuellement mettre en place une correction.
-
-Pour chacun des problèmes, la détection, les solutions théoriques et les corrections apportées rapportent un certain nombre de points en fonction de leur impact NR, et sont présentés dans la partie « Problèmes à identifier » de ce document.
-
-L’objectif final est donc d’obtenir le maximum de points. Aucun minimum n’est imposé, il s’agit d’une manière un peu ludique de présenter le TP et de « féliciter » les développeurs les plus performants.
-
-## Enoncé
-Vous êtes développeur de l’application « Aubay - NR », c’est une application récente en Java 17 et Angular 14, basée sur Spring Boot. Le client ne semble pas satisfait des performances de l’application, cela semble cacher des problèmes structurels, des mauvaises pratiques de développement, et des configurations douteuses. 
-Suite à la sensibilisation que vous venez de recevoir, vous devez prendre quelques heures pour identifier des problèmes, imaginer des solutions et pourquoi pas tenter de les corriger, vous avez carte blanche tant qu’il n’y a pas d’impact fonctionnel.
-Chacun des problèmes identifié et éventuellement résolu vous rapportera un certain nombre de points (Une solution théorique rapporte moins de points qu’une solution fonctionnelle). Pensez à noter vos idées, une idée qui n’est pas écrite avant la fin du TP ne rapporte pas de point !
-
-
 ## Problèmes à identifier
 
 ### Le modèle relationnel
@@ -105,40 +62,6 @@ Plusieurs API exposent des données sans limitations. C’est par exemple le cas
 		<td>1</td>
 		<td>3</td>
 		<td>5</td>
-	</tr>
-</table>
-
-
-### Attention aux nouveautés
-L’application est récente et utilise les dernières technologies disponibles. En l’occurrence, l’utilisation de Java 17 impose l’entreprise de disposer de JRE 17 installés sur leurs serveurs. Cette contrainte risque de forcer les équipes DevOps à fournir plus de travail pour installer et entretenir les environnements, alors que l’utilisation de Java 17 est très moyennement justifiée : La seule fonctionnalité de Java 17 exploitée dans l’application est présente dans RequestStatisticsInterceptor, en Java 17 :<br />
-
-```java
-if (response instanceof ContentCachingResponseWrapper cachedResponse) {
-       length = cachedResponse.getContentSize();
-}
-```
-Au lieu de (Java < 16) :
-
-```java
-if (response instanceof ContentCachingResponseWrapper) {
-       ContentCachingResponseWrapper cachedResponse = (ContentCachingResponseWrapper) response;
-       length = cachedResponse.getContentSize();
-}
-```
-Oui, c’est plus court, mais est-ce que cela vaut la peine d’imposer cette contrainte à une entreprise qui n’a pas encore sauté le pas vers Java 17 ? Évidemment, si l’entreprise a déjà installé le JRE 17 sur ses serveurs, ce problème est sans objet.
-
-<table border="1">
-	<tr>
-		<th>Problème</th>
-		<th>Identifié</th>
-		<th>Solution théorique</th>
-		<th>Correction en place</th>
-	</tr>
-	<tr>
-		<td>La version 17 de Java n’est pas justifiée</td>
-		<td>1</td>
-		<td>2</td>
-		<td>4</td>
 	</tr>
 </table>
 
